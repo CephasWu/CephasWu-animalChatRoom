@@ -93,7 +93,7 @@ async function checkName() {
       alert(message)
     }
   } else {
-    await router.push({name: "chatRoom", query: {name: nickName.value.value}}); // 如果 checkName 沒有拋出錯誤，跳轉到聊天室
+    await router.push({name: "chatRoom", query: {name: nickName.value.value, picSrc: animalPic.src}}); // 如果 checkName 沒有拋出錯誤，跳轉到聊天室
   }
 }
 

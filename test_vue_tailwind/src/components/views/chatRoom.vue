@@ -20,40 +20,45 @@
         {{ localTime }}
       </div>
     </div>
-    <div v-show="index!=0" v-for="(item,index) in systemText" :key="item" class="flex justify-center mt-5 text-white text-xm">
-      <p>{{ item.post }}</p>
-    </div>
-    <div class="flex" v-show="index!=0" v-for="(item,index) in otherText" :key="item">
-      <div class="bg-amber-200 pt-2 w-fit h-fit rounded-xl self-start mt-5">
-        <div class="flex ">
-          <img src="../../assets/pics/cat_icon_2.png" alt="cat" class="w-10 h-10 ml-2">
-          <div class="mwt_border ">
-            <div>
-              <span class="arrow_l_int"></span>
-              <span class="arrow_l_out "></span>
-              <p>{{ item.post }}</p>
+
+
+    <div v-show="index!=0" v-for="(item,index) in messageList" :key="item"
+         :class="{'self-end' : item.category == '1'}">
+      <div v-if="item.category == '0'" class="flex justify-center mt-5 text-white text-xm">
+        <p>{{ item.post }}</p>
+      </div>
+      <div v-else-if="item.category == '1'" class="flex">
+        <div class="text-white text-xs mr-1 self-end">
+          {{ item.time }}
+        </div>
+        <div class="w-fit h-fit mt-6 pt-2 bg-amber-300 rounded-xl">
+          <div class="flex">
+            <img :src="myPicSrc()" :alt="myPicAlt" class="w-10 h-10 ml-2">
+            <div class="mwt_border">
+              <div>
+                <span class="arrow_l_int"></span>
+                <span class="arrow_l_out "></span>
+                {{ item.post }}
+              </div>
             </div>
           </div>
         </div>
       </div>
-      <div class="self-end ml-1 text-white text-xs">
-        {{ item.time }}
-      </div>
-    </div>
-    <div v-show="index!=0" v-for="(item,index) in myText" :key="item" class="flex self-end ">
-      <div class="text-white text-xs self-end mr-1">
-        {{ item.time }}
-      </div>
-      <div class="w-fit h-fit mt-6 pt-2 bg-amber-300 rounded-xl">
-        <div class="flex">
-          <img src="../../assets/pics/cat_icon_1.png" alt="cat" class="w-10 h-10 ml-2">
-          <div class="mwt_border">
-            <div>
-              <span class="arrow_l_int"></span>
-              <span class="arrow_l_out "></span>
-              {{ item.post }}
+      <div v-else class="flex">
+        <div class="bg-amber-200 pt-2 w-fit h-fit rounded-xl mt-5">
+          <div class="flex">
+            <img src="../../assets/pics/cat_icon_2.png" alt="cat" class="w-10 h-10 ml-2">
+            <div class="mwt_border ">
+              <div>
+                <span class="arrow_l_int"></span>
+                <span class="arrow_l_out "></span>
+                <p>{{ item.post }}</p>
+              </div>
             </div>
           </div>
+        </div>
+        <div class="self-end ml-1 text-white text-xs">
+          {{ item.time }}
         </div>
       </div>
     </div>
@@ -93,9 +98,7 @@ import {useRouter} from 'vue-router';
 
 const router = useRouter();
 const inputValue = ref();
-const myText = ref([{post: '', time: ''}]);
-const otherText = ref([{post: '', time: ''}]);
-const systemText = ref([{post: '', time: ''}]);
+const messageList = ref([{post: '', time: '', category: ''}]);
 const scroll = ref()
 const inputMessage = ref()
 const friends = ref();
@@ -103,6 +106,8 @@ const friendCount = ref(1);
 const socket = ref();
 const userId = ref();
 const localTime = new Date().toLocaleTimeString();
+const picSrc = ref();
+const myPicAlt = ref();
 
 function sendMessage() {
   // 傳送訊息到 WebSocket 伺服器
@@ -115,6 +120,21 @@ function sendMessage() {
   } else {
     alert("WebSocket 尚未連線。");
   }
+}
+
+function getPicSrc() {
+  picSrc.value = router.currentRoute.value.query.picSrc;
+  picSrc.value = picSrc.value.slice(5, 10).split("_");
+  myPicAlt.value = getPicAlt();
+  return require("@/assets/pics/" + picSrc.value[0] + "_icon_" + picSrc.value[1] + ".png");
+}
+
+function myPicSrc() {
+  return picSrc.value;
+}
+
+function getPicAlt() {
+  return picSrc.value[0] + "_icon_" + picSrc.value[1] ;
 }
 
 function connectWebSocket() {
@@ -130,12 +150,12 @@ function connectWebSocket() {
     let message = event.data.split("：")[1];//取得發言內容
     let time = new Date().toLocaleTimeString();
     if (user == "System") {
-      systemText.value.push({post: message, time: time});
+      messageList.value.push({post: message, time: time, category: '0'});
       getFriendList();//取得聊天室列表
     } else if (user == userId.value) {//若發言者為自己，留言顯示在右邊
-      myText.value.push({post: message, time: time});
+      messageList.value.push({post: message, time: time, category: '1'});
     } else {
-      otherText.value.push({post: message, time: time});//其他人的留言顯示在左邊
+      messageList.value.push({post: message, time: time, category: '2'});//其他人的留言顯示在左邊
     }
     nextTick(() => {
       scroll.value.scrollTop = scroll.value.scrollHeight;
@@ -162,7 +182,7 @@ function getFriendList() {
       'userName': encodeURI(userId.value),//將名稱含有國字編碼後傳送
     },
   }).then(response => {
-    friendCount.value += parseInt(response.headers.get("friends-count"));//取得在線人數
+    friendCount.value = 1 + parseInt(response.headers.get("friends-count"));//取得在線人數
     return response.json();
   }).then(data => {
     friends.value = data;
@@ -174,7 +194,7 @@ function getFriendList() {
 onMounted(() => {
   //loginChatRoom傳來的userName
   userId.value = router.currentRoute.value.query.name;
-
+  picSrc.value = getPicSrc();
   connectWebSocket();//連接WebSocket
 });
 
