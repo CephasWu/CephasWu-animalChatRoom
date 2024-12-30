@@ -1,0 +1,24 @@
+server:
+  port: 8081
+
+spring:
+  devtools:
+    restart:
+      enabled: true  #设置开启热部署
+      additional-paths: src/main/java #重启目录
+      exclude: WEB-INF/**
+  thymeleaf:
+    cache: false #使用Thymeleaf模板引擎，关闭缓存
+
+  redis:
+    database: 0
+    host: localhost
+    port: 6379
+    timeout: 10
+    lettuce:
+      pool:
+        max-active: 8
+        max-wait: -1
+        max-idle: 10
+        min-idle: 5
+      shutdown-timeout: 100ms
