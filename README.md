@@ -2,13 +2,13 @@
 ============
 「狗狗貓貓聊天室」是一個即時聊天應用，專為愛狗狗和貓貓的人群設計。用戶可以在這個平台上分享自己的寵物經歷、照片、影片，並與其他寵物愛好者進行互動和交流。這個系統的前端使用 Vue 3，後端基於 Spring Boot，並結合 WebSocket 和 Redis 來實現高效的實時消息推送與數據存儲。
 
-核心技術概述
-前端：Vue 3 + TailwindCSS + WebSocket
+### 核心技術概述
+#### 前端：Vue 3 + TailwindCSS + WebSocket
 
-Vue 3 是一個現代化的 JavaScript 框架，用於構建單頁應用（SPA），能夠輕鬆管理聊天室的界面與狀態。
-TailwindCSS 用於快速構建響應式和美觀的聊天室界面，提升用戶體驗。
-WebSocket 實現前端與後端的雙向實時通信，支持即時聊天功能。
-後端：Spring Boot + WebSocket + Redis
+- Vue 3 是一個現代化的 JavaScript 框架，用於構建單頁應用（SPA），能夠輕鬆管理聊天室的界面與狀態。
+- TailwindCSS 用於快速構建響應式和美觀的聊天室界面，提升用戶體驗。
+- WebSocket 實現前端與後端的雙向實時通信，支持即時聊天功能。
+#### 後端：Spring Boot + WebSocket + Redis
 
 Spring Boot 提供後端服務，管理用戶、消息的處理和推送，並與 WebSocket 進行交互。
 WebSocket 用於實時消息推送，確保即時溝通無延遲。
