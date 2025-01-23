@@ -93,12 +93,23 @@ async function checkName() {
       alert(message)
     }
   } else {
-    await router.push({name: "chatRoom", query: {name: nickName.value.value, picSrc: animalPic.src}}); // 如果 checkName 沒有拋出錯誤，跳轉到聊天室
+    await router.push(
+        {
+          name: "chatRoom", query: {
+            name: nickName.value.value, picSrc: getPicSrc()
+          }
+        }
+    ); // 如果 checkName 沒有拋出錯誤，跳轉到聊天室
   }
 }
 
 function goChat() {
   nickName.value.value.trim() == "" ? alert("請輸入您的暱稱") : checkName();  // 名稱不為空就檢查名稱是否重複
+}
+function getPicSrc() {
+  let regex = /\/img(.*)/;   // 匹配 'img/' 之後的字母、數字和下劃線
+  let match = animalPic.src.match(regex);
+  return match[0];
 }
 
 </script>
